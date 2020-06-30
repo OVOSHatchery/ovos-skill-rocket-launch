@@ -1,0 +1,22 @@
+{
+  "name": "Rocket Launches",
+  "skillname": "skill-rocket-launch",
+  "authorname": "JarbasSkills",
+  "foldername": "",
+  "url": "https://github.com/JarbasSkills/skill-rocket-launch",
+  "branch": "master",
+  "desktopFile": false,
+  "warning": "",
+  "systemDeps": false,
+  "platforms": [
+    "arm",
+    "arm64",
+    "i386",
+    "x86_64",
+    "ia64"
+  ],
+  "examples": [
+    "when is the next rocket launch",
+    "tell me more"
+  ]
+}
