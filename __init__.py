@@ -1,16 +1,17 @@
-from adapt.intent import IntentBuilder
-from mycroft.skills.core import MycroftSkill, intent_handler
+from ovos_workshop.intents import IntentBuilder
+from ovos_workshop.skills import OVOSSkill
+from ovos_workshop.decorators import intent_handler
 import requests
 from datetime import datetime, timedelta
 from lingua_franca.format import nice_date, nice_duration
 
 
-class SpaceLaunchSkill(MycroftSkill):
+class SpaceLaunchSkill(OVOSSkill):
     # https://www.rocketlaunch.live/api
     # https://launchlibrary.net/
-    @intent_handler(IntentBuilder("SpaceLaunchIntent")
-                    .require("SpaceLaunchKeyword")
-                    .optionally('ExactLaunchKeyword').optionally("next"))
+    @intent_handler(
+        IntentBuilder("SpaceLaunchIntent").require("SpaceLaunchKeyword").
+        optionally('ExactLaunchKeyword').optionally("next"))
     def handle_space_launch_intent(self, message):
         try:
             r = requests.get("https://launchlibrary.net/1.2/launch/next/1"
@@ -26,19 +27,27 @@ class SpaceLaunchSkill(MycroftSkill):
             if delta <= timedelta(days=2):
                 date_time = nice_duration(delta, lang=self.lang, speech=True)
                 self.speak_dialog("space.launch.delta",
-                                  data={'rocket': rocket,
-                                        'delta': date_time,
-                                        'location': location})
+                                  data={
+                                      'rocket': rocket,
+                                      'delta': date_time,
+                                      'location': location
+                                  })
             else:
                 date_time = nice_date(dt, lang=self.lang, now=now)
                 self.speak_dialog("space.launch",
-                                  data={'rocket': rocket,
-                                        'time': date_time,
-                                        'location': location})
+                                  data={
+                                      'rocket': rocket,
+                                      'time': date_time,
+                                      'location': location
+                                  })
 
-            self.gui.show_image(image, caption=location,
-                                title=rocket, override_idle=True,
-                                fill='PreserveAspectFit',)
+            self.gui.show_image(
+                image,
+                caption=location,
+                title=rocket,
+                override_idle=True,
+                fill='PreserveAspectFit',
+            )
 
             self.set_context("launch_description", description)
             self.set_context("rocketPic", image)
@@ -48,18 +57,18 @@ class SpaceLaunchSkill(MycroftSkill):
             self.log.error(e)
             self.speak_dialog("not.found")
 
-    @intent_handler(IntentBuilder("SpaceLaunchMoreIntent")
-                    .require("launch_description").require("rocket")
-                    .require("rocketPic").require('MoreKeyword'))
+    @intent_handler(
+        IntentBuilder("SpaceLaunchMoreIntent").require("launch_description").
+        require("rocket").require("rocketPic").require('MoreKeyword'))
     def handle_space_launch_desc_intent(self, message):
         description = message.data["launch_description"]
         rocket = message.data["rocket"]
         image = message.data["rocketPic"]
         self.speak(description)
-        self.gui.show_image(image, caption=description,
-                            title=rocket, override_idle=True,
-                            fill='PreserveAspectFit', )
-
-
-def create_skill():
-    return SpaceLaunchSkill()
+        self.gui.show_image(
+            image,
+            caption=description,
+            title=rocket,
+            override_idle=True,
+            fill='PreserveAspectFit',
+        )
